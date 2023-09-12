@@ -1,23 +1,26 @@
-from math import degrees
 import os
 import sys
-from urllib.request import AbstractHTTPHandler
 import snap
 import matplotlib.pyplot as plt
-import time
 
 Rnd = snap.TRnd(42)
 Rnd.Randomize()
  
 def compute_graph_size(G : snap.TUNGraph) :
+    '''
+        Function to compute number of nodes and edges in the graph.
+    '''
     print("Number of nodes:", G.GetNodes())
     print("Number of edges:", G.GetEdges())
 
+
 def compute_graph_degree(G : snap.TUNGraph, filepath : str) :
-    # Compute degree distribution
+    '''
+        Function to compute degree distribution of the graph.
+    '''
     CntV = G.GetOutDegCnt()
     deg_dist = {}
-    for p in CntV:
+    for p in CntV:  # convert CntV to a dictionary
         deg_dist[p.GetVal1()] = p.GetVal2()
 
     # Print number of nodes with degree 7
@@ -35,51 +38,51 @@ def compute_graph_degree(G : snap.TUNGraph, filepath : str) :
     print("Node id(s) with highest degree:", ", ".join(max_deg_nodes))
 
     # Plot degree distribution
-    degrees = list(deg_dist.keys())
-    frequencies = list(deg_dist.values())
-
-    plt.plot(degrees, frequencies, marker='o', linestyle='-')
-
     subgraph_name = filepath.split('/')[-1].split('.')[0]
     os.makedirs("plots", exist_ok=True)
-    plot_filepath = os.path.join("plots", "deg_dist_" + subgraph_name + ".png")
-    plt.savefig(plot_filepath)
+    os.chdir("plots")
+
+    G.PlotOutDegDistr("deg_dist_" + subgraph_name, "Degree Distribution")
+    os.rename("outDeg.deg_dist_" + subgraph_name + ".png", "deg_dist_" + subgraph_name + ".png")
+    os.remove("outDeg.deg_dist_" + subgraph_name + ".tab")
+    os.remove("outDeg.deg_dist_" + subgraph_name + ".plt")
+    os.chdir("..")
+
 
 def compute_graph_path(G : snap.TUNGraph, num_nodes : int, filepath : str) :
+    '''
+        Function to compute shortest path distribution of the graph.
+    '''
+
     fullDiam = G.GetBfsFullDiam(num_nodes, False)
     print("Approximate full diameter: %d" % fullDiam)
     effDiam = G.GetBfsEffDiam(num_nodes, False)
     print("Approximate effective diameter: %d" % effDiam)
 
-    # # compute distribution of graph shortest path lengths
-    # pathDist = dict()
+    # compute distribution of graph shortest path lengths
+    pathDist = dict()
     # start = time.time()
-    # for N in G.Nodes():
-    #     _, IdtoDistH = G.GetShortPathAll(N.GetId(), False)
+    for N in G.Nodes():
+        _, IdtoDistH = G.GetShortPathAll(N.GetId(), False)
         
-    #     for id in IdtoDistH:
-    #         pathLen = IdtoDistH[id]
-    #         if pathLen not in pathDist:
-    #             pathDist[pathLen] = 1
-    #         else:
-    #             pathDist[pathLen] += 1
+        for id in IdtoDistH:
+            pathLen = IdtoDistH[id]
+            if pathLen not in pathDist:
+                pathDist[pathLen] = 1
+            else:
+                pathDist[pathLen] += 1
     # t = time.time() - start
 
-    # for len in pathDist:
-    #     print(len, pathDist[len])  
+    subgraph_name = filepath.split('/')[-1].split('.')[0]
+    os.makedirs("plots", exist_ok=True)
+    os.chdir("plots")
+    
+    G.PlotShortPathDistr("shortest_path_" + subgraph_name, "Shortest Path Distribution")
+    os.rename("diam.shortest_path_" + subgraph_name + ".png", "shortest_path_" + subgraph_name + ".png")
+    os.remove("diam.shortest_path_" + subgraph_name + ".tab")
+    os.remove("diam.shortest_path_" + subgraph_name + ".plt")
+    os.chdir("..")
 
-    # print(f"Time : {t} s") 
-
-    # distances = list(pathDist.keys())
-    # freqs = (pathDist.values())
-
-    # plt.plot(distances, freqs, marker='o', linestyle='-')
-    # plt.xlim(0, max(distances))
-
-    # subgraph_name = filepath.split('/')[-1].split('.')[0]
-    # os.makedirs("plots", exist_ok=True)
-    # plot_filepath = os.path.join("plots", "shortest_path_" + subgraph_name + ".png")
-    # plt.savefig(plot_filepath)
 
 def compute_graph_comp(G : snap.TUNGraph, filepath : str) :
 
@@ -94,27 +97,32 @@ def compute_graph_comp(G : snap.TUNGraph, filepath : str) :
     artPts = G.GetArtPoints()
     print("Number of articulation points: ", len(artPts))
 
-    Sccs = G.GetSccs()
-    scc_size_dist = dict()
+    # Sccs = G.GetSccs()
+    # scc_size_dist = dict()
 
-    for scc in Sccs:
-        if scc.Len() not in scc_size_dist:
-            scc_size_dist[scc.Len()] = 1
-        else:
-            scc_size_dist[scc.Len()] += 1
+    # for scc in Sccs:
+    #     if scc.Len() not in scc_size_dist:
+    #         scc_size_dist[scc.Len()] = 1
+    #     else:
+    #         scc_size_dist[scc.Len()] += 1
 
-    # for size in scc_size_dist:
-    #     print(size, scc_size_dist[size])
+    # # for size in scc_size_dist:
+    # #     print(size, scc_size_dist[size])
         
-    sizes = list(scc_size_dist.keys())
-    freqs = list(scc_size_dist.values())
+    # sizes = list(scc_size_dist.keys())
+    # freqs = list(scc_size_dist.values())
 
-    plt.plot(sizes, freqs, marker='o', linestyle='-')
+    # plt.plot(sizes, freqs, marker='o', linestyle='-')
 
     subgraph_name = filepath.split('/')[-1].split('.')[0]
     os.makedirs("plots", exist_ok=True)
-    plot_filepath = os.path.join("plots", "connected_comp_" + subgraph_name + ".png")
-    plt.savefig(plot_filepath)
+    os.chdir("plots")
+    
+    G.PlotSccDistr("connected_comp_" + subgraph_name, "Connected Component Distribution")
+    # os.rename("diam.connected_comp_" + subgraph_name + ".png", "connected_comp_" + subgraph_name + ".png")
+    # os.remove("diam.connected_comp_" + subgraph_name + ".tab")
+    # os.remove("diam.connected_comp_" + subgraph_name + ".plt")
+    os.chdir("..")
 
 def compute_graph_connectivity(G : snap.TUNGraph, filepath : str) :
 
@@ -133,34 +141,39 @@ def compute_graph_connectivity(G : snap.TUNGraph, filepath : str) :
     nId = G.GetRndNId(Rnd)
     print(f"Number of triads random node {nId} participates: {G.GetNodeTriads(nId)}")
 
-    '''
-        TODO: Giving OOM error for twitter graph !
-    '''
+    # '''
+    #     TODO: Giving OOM error for twitter graph !
+    # '''
 
-    nIdCCfH = G.GetNodeClustCfAll()
-    ccf_dist = dict()
+    # nIdCCfH = G.GetNodeClustCfAll()
+    # ccf_dist = dict()
 
-    for id in nIdCCfH:
-        rnd_ccf = round(nIdCCfH[id], 1)     # divide ccf values into buckets of width 0.1
-        if rnd_ccf not in ccf_dist:
-            ccf_dist[rnd_ccf] = 1
-        else:
-            ccf_dist[rnd_ccf] += 1
+    # for id in nIdCCfH:
+    #     rnd_ccf = round(nIdCCfH[id], 1)     # divide ccf values into buckets of width 0.1
+    #     if rnd_ccf not in ccf_dist:
+    #         ccf_dist[rnd_ccf] = 1
+    #     else:
+    #         ccf_dist[rnd_ccf] += 1
 
-    sorted_ccf_dist = dict(sorted(ccf_dist.items()))    # sort the ccf distribution dictionary by key
+    # sorted_ccf_dist = dict(sorted(ccf_dist.items()))    # sort the ccf distribution dictionary by key
 
-    # for ccf in sorted_ccf_dist:
-    #     print(ccf, sorted_ccf_dist[ccf])
+    # # for ccf in sorted_ccf_dist:
+    # #     print(ccf, sorted_ccf_dist[ccf])
 
-    ccfs = list(sorted_ccf_dist.keys())
-    freqs = list(sorted_ccf_dist.values())
+    # ccfs = list(sorted_ccf_dist.keys())
+    # freqs = list(sorted_ccf_dist.values())
 
-    plt.plot(ccfs, freqs, marker='o', linestyle='-')
+    # plt.plot(ccfs, freqs, marker='o', linestyle='-')
 
     subgraph_name = filepath.split('/')[-1].split('.')[0]
     os.makedirs("plots", exist_ok=True)
-    plot_filepath = os.path.join("plots", "clustering_coeff_" + subgraph_name + ".png")
-    plt.savefig(plot_filepath)
+    os.chdir("plots")
+    
+    G.PlotSccDistr("clustering_coeff_" + subgraph_name, "Clustering Coefficient Distribution")
+    # os.rename("diam.clustering_coeff_" + subgraph_name + ".png", "clustering_coeff_" + subgraph_name + ".png")
+    # os.remove("diam.clustering_coeff_" + subgraph_name + ".tab")
+    # os.remove("diam.clustering_coeff_" + subgraph_name + ".plt")
+    os.chdir("..")
         
 def compute_graph_centrality(G : snap.TUNGraph) :
     
@@ -196,11 +209,11 @@ def compute_graph_centrality(G : snap.TUNGraph) :
 def main(args):
     filepath = args[1]
     G = snap.LoadEdgeList(snap.TUNGraph, filepath)
-    compute_graph_size(G)
-    compute_graph_degree(G, filepath)
+    # compute_graph_size(G)
+    # compute_graph_degree(G, filepath)
     num_rand_nodes = 1000
     compute_graph_path(G, num_rand_nodes, filepath)
-    compute_graph_comp(G, filepath)
+    # compute_graph_comp(G, filepath)
     # compute_graph_connectivity(G, filepath)
     # compute_graph_centrality(G)
     

@@ -1,0 +1,30 @@
+SOCIAL COMPUTING (CS60017)
+ASSIGNMENT 1
+
+NAME : SHREYAS JENA
+ROLL NO : 20CS30049
+
+
+Environment setup : (Python 3.7 or above)
+
+- Steps :
+
+    - Create a virtual environment using : 
+        python3 -m venv <env_name>
+
+    - Activate the virtual environment using :
+        source <env_name>/bin/activate
+
+    - Install the required packages using :
+        pip install -r requirements.txt
+
+Code Execution :
+
+    Part 1 - (Dataset Preparation) :
+        python3 gen_graphs.py
+
+    Part 2 - (Familiarizing with the SNAP Library) :
+        python3 gen_structure.py <input_file_path>
+
+    Part 3 - (Compute Centrality Metrics) :
+        python3 gen_centrality.py <input_file_path>

@@ -1,7 +1,3 @@
-import torch.nn as nn
-import torch
-
-embed = nn.Embedding(539, 64)
-input = torch.ones(651, 651, dtype=torch.long)
-output = embed(input)
-print(output.shape)
+a = {"a": 1, "b": 2, "c": 3}
+for x in a.items():
+    print(type(x))
