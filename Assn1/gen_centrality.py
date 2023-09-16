@@ -19,9 +19,13 @@ def compute_closeness_centrality(G : snap.TUNGraph, save_path: str) :
     for N in tqdm(G.Nodes()):
         id = N.GetId()
         _, shortestPaths = G.GetShortPathAll(id)    # compute shortest path lengths from given node to all other nodes
-        sum_paths = sum([shortestPaths[i] for i in shortestPaths])  
-        cc_dict[id] = (G.GetNodes() - 1) / sum_paths    # compute closeness centrality for given node
-    
+        sum_paths = sum([shortestPaths[i] for i in shortestPaths if i!=id])  
+        cc = (G.GetNodes() - 1) / sum_paths    # compute closeness centrality for given node
+        if cc > 1:  # if graph is not connected, cc may be greater than 1
+            cc = 0
+
+        cc_dict[id] = cc
+        
     cc_sorted = sorted(cc_dict.items(), key=lambda x: x[1], reverse=True)
 
     filename = "closeness.txt"
@@ -129,14 +133,15 @@ def compute_biased_pagerank(G : snap.TUNGraph, alpha: float, save_path: str) :
     '''
     # function to check convergence of pagerank
     def check_convergence(PR, prev_PR):
-        sum = 0
+        max = -1
         for id, pr in PR.items():
-            sum += abs(pr - prev_PR[id])
+            if max < abs(pr - prev_PR[id]):
+                max = abs(pr - prev_PR[id])
         
-        if sum/len(PR) > 1e-6:  # check if difference between pagerank vectors is less than threshold
+        if max > 1e-10:  # check if difference between pagerank vectors is less than threshold
             return False
         return True
-    priority_nodes = [node.GetId() for node in G.Nodes() if node.GetId()%5==0]
+    priority_nodes = [node.GetId() for node in G.Nodes() if node.GetId()%4==0]
     N = G.GetNodes()
     S = len(priority_nodes)
     d = {}
@@ -145,7 +150,7 @@ def compute_biased_pagerank(G : snap.TUNGraph, alpha: float, save_path: str) :
     for node in G.Nodes():
         id = node.GetId()
         if S!=0:    # if there are priority nodes
-            if id%5==0:
+            if id%4==0:
                 d[id] = 1/S
             else:
                 d[id] = 0

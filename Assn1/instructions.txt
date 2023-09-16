@@ -26,5 +26,28 @@ Code Execution :
     Part 2 - (Familiarizing with the SNAP Library) :
         python3 gen_structure.py <input_file_path>
 
+        Time - (estimated) :
+
+        - Twitter.elist : (around 1.5-2 hr)
+        
+        	NOTE : 
+        		
+        		I could not generate the plot for distribution of clustering coefficient for the Twitter graph (i.e., clustering_coeff_twitter.png)
+                as my code kept giving OOM errors like :
+                
+                    terminate called after throwing an instance of 'std::bad_alloc'
+                        what():  std::bad_alloc
+                    Aborted (core dumped)
+
+                on my device, even though I used standard SNAP functions for loading the graph. 
+                The same code worked for other graph files, so I'm guessing it might be lack of sufficient RAM.
+
+            
+
     Part 3 - (Compute Centrality Metrics) :
         python3 gen_centrality.py <input_file_path>
+
+        Time - (estimated) :
+
+        - Twitter.elist : (around 1.5-2 hr)
+        - Facebook.elist : (around 3 mins)
