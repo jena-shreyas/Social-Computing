@@ -1,4 +1,7 @@
 # Social-Computing (CS60017)
+- **Year** : Autumn 2023
+- **Instructor** : Prof. Saptarshi Ghosh
+
 The following tasks were covered in the assignments :
 
 - [**Assignment 1**](https://github.com/jena-shreyas/Social-Computing/tree/master/Assn1) :
